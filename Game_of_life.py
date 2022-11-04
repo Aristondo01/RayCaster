@@ -10,7 +10,7 @@ screen = pygame.display.set_mode(
 
 Framebuffer= []
 tam = int(tam/pixeltam)
-    
+girar = None
 for i in range(tam):
     Framebuffer.append([])
     for j in range(tam):
@@ -218,32 +218,69 @@ def vida ():
         Framebuffer2.append([])
         for j in range(tam):
             celulas =0
-            #Derecha
-            if Framebuffer[i][(j+1)%tam] == 1:
-                celulas+=1
-            #Izquierda
-            if Framebuffer[i][j-1] == 1:
-                celulas+=1
-            #Abajo
-            if Framebuffer[i-1][j] == 1:
-                celulas+=1
-            #Arriba
-            if Framebuffer[(i+1)%tam][j] == 1:
-                celulas+=1
+            
+            if girar :
+                #Derecha
+                if Framebuffer[i][(j+1)%tam] == 1:
+                    celulas+=1
+                #Izquierda
+                if Framebuffer[i][j-1] == 1:
+                    celulas+=1
+                #Abajo
+                if Framebuffer[i-1][j] == 1:
+                    celulas+=1
+                #Arriba
+                if Framebuffer[(i+1)%tam][j] == 1:
+                    celulas+=1
+                    
+                #Derecha arriba
+                if Framebuffer[(i+1)%tam][(j+1)%tam] == 1:
+                    celulas+=1
+                #Izquierda arriba
+                if Framebuffer[(i+1)%tam][j-1] == 1:
+                    celulas+=1
+                #Abajo izquierda
+                if Framebuffer[i-1][j-1] == 1:
+                    celulas+=1
+                #abajo derecha
+                if Framebuffer[i-1][(j+1)%tam] == 1:
+                    celulas+=1
+            else:
+                #Derecha
+                if  j+1 < tam :
+                    if Framebuffer[i][j+1] == 1:
+                        celulas+=1
+                #Izquierda
+                if j-1 >= 0: 
+                    if Framebuffer[i][j-1] == 1:
+                        celulas+=1
+                #Abajo
+                if i-1 >= 0:
+                    if Framebuffer[i-1][j] == 1:
+                        celulas+=1
+                #Arriba
+                if i+1 < tam:
+                    if Framebuffer[i+1][j] == 1:
+                        celulas+=1
+                    
+                #Derecha arriba
+                if j+1 < tam and i+1 < tam:
+                    if Framebuffer[i+1][j+1] == 1:
+                        celulas+=1
+                #Izquierda arriba
+                if i+1 < tam and j-1 >= 0:
+                    if Framebuffer[i+1][j-1] == 1:
+                        celulas+=1
+                #Abajo izquierda
+                if i-1 >= 0 and j-1 >= 0:
+                    if Framebuffer[i-1][j-1] == 1:
+                        celulas+=1
+                #abajo derecha
+                if i-1 >= 0 and j+1 < tam:
+                    if Framebuffer[i-1][(j+1)%tam] == 1:
+                        celulas+=1
                 
-            #Derecha arriba
-            if Framebuffer[(i+1)%tam][(j+1)%tam] == 1:
-                celulas+=1
-            #Izquierda arriba
-            if Framebuffer[(i+1)%tam][j-1] == 1:
-                celulas+=1
-            #Abajo izquierda
-            if Framebuffer[i-1][j-1] == 1:
-                celulas+=1
-            #abajo derecha
-            if Framebuffer[i-1][(j+1)%tam] == 1:
-                celulas+=1
-                
+                    
             Framebuffer2[i].append(0)
             
             if celulas < 2 and Framebuffer[i][j]==1:
@@ -267,7 +304,7 @@ def vida ():
             
             
     
-
+girar = True
 oscillators(80,75)
 pulsar(50,50)
 glider(20,20)
