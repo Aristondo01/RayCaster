@@ -1,9 +1,11 @@
 import pygame
-from math import cos, sin, pi
+from math import cos, sin, pi,atan2
 import random
 
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
+
+TRASPARENTE = (152,0,136)
 
 SKY = (50, 100, 200)
 GROUND = (200, 200, 100)
@@ -26,6 +28,22 @@ walls = {
     "3" : wall3,
 }
 
+enemie1 = pygame.image.load('./sprite1.png')
+
+enemies = [{
+    "x": 120,
+    "y": 120,
+    "sprite": enemie1},
+           
+    {
+    "x": 100,
+    "y": 300,
+    "sprite": enemie1}
+]
+    
+
+
+
 class Raycaster(object):
     def __init__(self, screen):
         self.screen = screen
@@ -38,7 +56,11 @@ class Raycaster(object):
             "fov": int(pi / 3),
             "a": int(pi / 3)
         }
+        self.clearZ()
 
+    def clearZ(self):
+        self.zbuffer = [9999999 for z in range(0, 500)]
+        
     def point(self, x, y, c = WHITE):
         # No usa aceleracion grafica. Usar pixel o point usado en juego de la vida
         self.screen.set_at((x, y), c)
@@ -92,7 +114,35 @@ class Raycaster(object):
 
             self.point(x, y)
             d += 1
-
+    def draw_sprite(self,sprite):
+        
+        
+        px,py = self.player["x"],self.player["y"]
+        sx,sy = sprite["x"],sprite["y"]
+        
+        
+        
+        d = ((px - sx)**2 + (py -sy)**2)**0.5
+        sprite_a = atan2(sy - py,sx-px)
+        sprite_size = int(500/d  * 500/10)
+        sprite_y = int (500/2 - sprite_size/2) 
+        
+        sprite_x = 500 + int((sprite_a - self.player["a"])* 500/self.player["fov"] + sprite_size/2)
+        
+        
+        
+        for x in range(sprite_x,sprite_x+sprite_size):
+            for y in range(sprite_y,sprite_y+sprite_size):
+                tx = int((x - sprite_x)  * 128/sprite_size)
+                ty = int((y - sprite_y) * 128/sprite_size)
+                c = sprite["sprite"].get_at((tx,ty))
+                if c != TRASPARENTE:
+                    if 500<x and x<1000:
+                        if self.zbuffer[x - 500] >= d:
+                            self.zbuffer[x - 500] =d
+                            self.point(x,y,c)
+            
+        
     def draw_map(self):
         for x in range(0, 500, self.block_size):
             for y in range(0, 500, self.block_size):
@@ -108,6 +158,7 @@ class Raycaster(object):
     def render(self):
         self.draw_map()
         self.draw_player()
+        self.clearZ()
 
         density = 100
 
@@ -133,9 +184,16 @@ class Raycaster(object):
             
             x = int(self.width / 2) + i
             h = (self.height / (d * cos(a - self.player["a"]))) * self.height / 5
-
-            self.draw_stake(x, h, c, tx)
-
+            
+            if self.zbuffer[i] >= d:
+                self.zbuffer[i] = d
+                self.draw_stake(x, h, c, tx)
+        
+        for enemigo in enemies:
+            self.point(enemigo["x"],enemigo["y"],(255,0,0))
+            
+        for enemigo in enemies:
+            self.draw_sprite(enemigo)
 
 pygame.init()
 screen = pygame.display.set_mode((1000, 500))
