@@ -5,7 +5,7 @@ import random
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 
-TRASPARENTE = (152,0,136)
+TRASPARENTE = (1,255,1)
 
 SKY = (50, 100, 200)
 GROUND = (200, 200, 100)
@@ -18,14 +18,12 @@ colors = [
     (21, 42, 138)
 ]
 
-wall1 = pygame.image.load('./wall1.png')
-wall2 = pygame.image.load('./wall2.png')
-wall3 = pygame.image.load('./wall3.png')
+wall1 = pygame.image.load('./PARED1.jpg')
+wall2 = pygame.image.load('./PARED2.jpeg')
 
 walls = {
     "1" : wall1,
     "2" : wall2,
-    "3" : wall3,
 }
 
 enemie1 = pygame.image.load('./sprite1.png')
@@ -68,8 +66,8 @@ class Raycaster(object):
     def block(self, x, y, wall):
         for i in range(x, x + self.block_size):
             for j in range(y, y + self.block_size):
-                tx = int((i - x) * 128 / self.block_size)
-                ty = int((j - y) * 128 / self.block_size)
+                tx = int((i - x) * 256 / self.block_size)
+                ty = int((j - y) * 256 / self.block_size)
                 c = wall.get_at((tx, ty))
                 self.point(i, j, c)
 
@@ -83,7 +81,7 @@ class Raycaster(object):
         end_y = int(self.height / 2 + h / 2)
         height = end_y - start_y
         for y in range(start_y, end_y):
-            ty = int((y - start_y) * 128 / height)
+            ty = int((y - start_y) * 256 / height)
             color = walls[c].get_at((tx, ty))
             self.point(x, y, color)
 
@@ -109,7 +107,7 @@ class Raycaster(object):
                 else:
                     maxhit = hity
 
-                tx = int(maxhit * 128 / self.block_size)
+                tx = int(maxhit * 256 / self.block_size)
                 return d, self.map[j][i], tx
 
             self.point(x, y)
@@ -124,8 +122,8 @@ class Raycaster(object):
         
         d = ((px - sx)**2 + (py -sy)**2)**0.5
         sprite_a = atan2(sy - py,sx-px)
-        sprite_size = int(500/d  * 500/10)
-        sprite_y = int (500/2 - sprite_size/2) 
+        sprite_size = int(500/d  * 500/20)
+        sprite_y = int (500/2 - sprite_size/6) 
         
         sprite_x = 500 + int((sprite_a - self.player["a"])* 500/self.player["fov"] + sprite_size/2)
         
@@ -133,8 +131,8 @@ class Raycaster(object):
         
         for x in range(sprite_x,sprite_x+sprite_size):
             for y in range(sprite_y,sprite_y+sprite_size):
-                tx = int((x - sprite_x)  * 128/sprite_size)
-                ty = int((y - sprite_y) * 128/sprite_size)
+                tx = int((x - sprite_x)  * 580/sprite_size)
+                ty = int((y - sprite_y) * 580/sprite_size)
                 c = sprite["sprite"].get_at((tx,ty))
                 if c != TRASPARENTE:
                     if 500<x and x<1000:
