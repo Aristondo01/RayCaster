@@ -4,11 +4,13 @@ import random
 
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
+RED = (255, 0, 0)
+
 
 TRASPARENTE = (1,255,1)
 
-SKY = (50, 100, 200)
-GROUND = (200, 200, 100)
+SKY = (38, 36, 50)
+GROUND = (88, 92, 121)
 
 colors = [
     (0, 20, 10),
@@ -17,6 +19,8 @@ colors = [
     (219, 242, 38),
     (21, 42, 138)
 ]
+load_screen = pygame.image.load('./inicio.png')
+
 
 wall1 = pygame.image.load('./PARED1.jpg')
 wall2 = pygame.image.load('./PARED2.jpeg')
@@ -31,12 +35,16 @@ enemie1 = pygame.image.load('./sprite1.png')
 enemies = [{
     "x": 120,
     "y": 120,
-    "sprite": enemie1},
+    "sprite": enemie1,
+    "pos": 0
+    },
            
     {
     "x": 100,
     "y": 300,
-    "sprite": enemie1}
+    "sprite": enemie1,
+    "pos": 1
+    }
 ]
     
 
@@ -48,18 +56,20 @@ class Raycaster(object):
         x, y, self.width, self.height = screen.get_rect()
         self.block_size = 50
         self.map = []
+        self.last_move=None
+        self.borrar =None
         self.player = {
             "x": int(self.block_size + (self.block_size / 2)),
             "y": int(self.block_size + (self.block_size / 2)),
             "fov": int(pi / 3),
-            "a": int(pi / 3)
+            "a": int(0)
         }
         self.clearZ()
 
     def clearZ(self):
         self.zbuffer = [9999999 for z in range(0, 500)]
         
-    def point(self, x, y, c = WHITE):
+    def point(self, x, y, c = RED):
         # No usa aceleracion grafica. Usar pixel o point usado en juego de la vida
         self.screen.set_at((x, y), c)
 
@@ -110,7 +120,7 @@ class Raycaster(object):
                 tx = int(maxhit * 256 / self.block_size)
                 return d, self.map[j][i], tx
 
-            self.point(x, y)
+            #self.point(x, y)
             d += 1
     def draw_sprite(self,sprite):
         
@@ -125,7 +135,8 @@ class Raycaster(object):
         sprite_size = int(500/d  * 500/20)
         sprite_y = int (500/2 - sprite_size/6) 
         
-        sprite_x = 500 + int((sprite_a - self.player["a"])* 500/self.player["fov"] + sprite_size/2)
+        sprite_x =int((sprite_a - self.player["a"])* 500/self.player["fov"] + sprite_size/2)
+        
         
         
         
@@ -135,9 +146,9 @@ class Raycaster(object):
                 ty = int((y - sprite_y) * 580/sprite_size)
                 c = sprite["sprite"].get_at((tx,ty))
                 if c != TRASPARENTE:
-                    if 500<x and x<1000:
-                        if self.zbuffer[x - 500] >= d:
-                            self.zbuffer[x - 500] =d
+                    if x>0 and x<500:
+                        if self.zbuffer[x] >= d:
+                            self.zbuffer[x] =d
                             self.point(x,y,c)
             
         
@@ -153,56 +164,244 @@ class Raycaster(object):
     def draw_player(self):
         self.point(self.player["x"], self.player["y"])
 
+    def start(self):
+        for x in range(0,500):
+            for y in range(0,500):
+                c = load_screen.get_at((x,y))
+                self.point(x,y,c)
+            
+    def disparo(self,sprite):
+        px,py = self.player["x"],self.player["y"]
+        sx,sy = sprite["x"],sprite["y"]
+        
+        
+        
+        d = ((px - sx)**2 + (py -sy)**2)**0.5
+        sprite_a = atan2(sy - py,sx-px)
+        sprite_size = int(500/d  * 500/20)
+        sprite_y = int (500/2 - sprite_size/6) 
+        
+        sprite_x =int((sprite_a - self.player["a"])* 500/self.player["fov"] + sprite_size/2)
+        
+        
+        
+        for x in range(240, 260):
+            for y in range(240, 260):
+                tx = int((x - sprite_x)  * 580/sprite_size)
+                ty = int((y - sprite_y) * 580/sprite_size)
+                try:
+                    c = sprite["sprite"].get_at((tx,ty))
+                except:
+                    c = 0
+                if c != 0 and c != TRASPARENTE:
+                    print("le di al tropper #"+str(sprite["pos"]))
+                    #print(sprite["pos"])
+                    #self.borrar =sprite["pos"]
+                    break
+                
+                    
+                    
+        
+    def error(self):
+        if self.last_move == "l":
+                
+            if self.player["a"] == 0:
+                self.player["y"] += 10
+                    
+            if self.player["a"] == pi/4:
+                self.player["x"] -= 10
+                self.player["y"] += 10
+                
+            if self.player["a"] == pi/2:
+                self.player["x"] -= 10
+                
+            if self.player["a"] == pi*3/4:
+                self.player["x"] -= 10
+                self.player["y"] -= 10
+                    
+            if self.player["a"] == pi:
+                self.player["y"] -= 10
+                
+            if self.player["a"] == pi*5/4:
+                self.player["x"] += 10
+                self.player["y"] -= 10
+                
+            if self.player["a"] == pi*6/4:
+                self.player["x"] += 10
+                
+            if self.player["a"] == pi*7/4:
+                self.player["y"] += 10
+                self.player["x"] += 10
+                    
+        if self.last_move == "r":
+            if self.player["a"] == 0:
+                self.player["y"] -= 10
+                
+            if self.player["a"] == pi/4:
+                self.player["x"] += 10
+                self.player["y"] -= 10
+                
+            if self.player["a"] == pi/2:
+                self.player["x"] += 10
+                
+            if self.player["a"] == pi*3/4:
+                self.player["x"] += 10
+                self.player["y"] += 10
+                
+            if self.player["a"] == pi:
+                self.player["y"] += 10
+                
+            if self.player["a"] == pi*5/4:
+                self.player["x"] -= 10
+                self.player["y"] += 10
+            
+            if self.player["a"] == pi*6/4:
+                self.player["x"] -= 10
+                
+            if self.player["a"] == pi*7/4:
+                self.player["y"] -= 10
+                self.player["x"] -= 10
+        if self.last_move == "d":
+            
+            if self.player["a"] == 0:
+                self.player["x"] += 10
+                
+            if self.player["a"] == pi/4:
+                self.player["x"] += 10
+                self.player["y"] += 10
+                
+            if self.player["a"] == pi/2:
+                self.player["y"] += 10
+                
+            if self.player["a"] == pi*3/4:
+                self.player["x"] -= 10
+                self.player["y"] += 10
+                
+            if self.player["a"] == pi:
+                self.player["x"] -= 10
+                
+            if self.player["a"] == pi*5/4:
+                self.player["x"] -= 10
+                self.player["y"] -= 10
+            
+            if self.player["a"] == pi*6/4:
+                self.player["y"] -= 10
+                
+            if self.player["a"] == pi*7/4:
+                self.player["y"] -= 10
+                self.player["x"] += 10
+                
+                
+        if self.last_move == "u":
+            if self.player["a"] == 0:
+                self.player["x"] -= 10
+                
+            if self.player["a"] == pi/4:
+                self.player["x"] -= 10
+                self.player["y"] -= 10
+                
+            if self.player["a"] == pi/2:
+                self.player["y"] -= 10
+                
+            if self.player["a"] == pi*3/4:
+                self.player["x"] += 10
+                self.player["y"] -= 10
+                
+            if self.player["a"] == pi:
+                self.player["x"] += 10
+                
+            if self.player["a"] == pi*5/4:
+                self.player["x"] += 10
+                self.player["y"] += 10
+            
+            if self.player["a"] == pi*6/4:
+                self.player["y"] += 10
+                
+            if self.player["a"] == pi*7/4:
+                self.player["y"] += 10
+                self.player["x"] -= 10
+        
     def render(self):
-        self.draw_map()
-        self.draw_player()
+        #self.draw_map()
+        #self.draw_player()
         self.clearZ()
 
-        density = 100
+        """
+        if self.borrar:
+            print("hola")
+            enemies.pop(self.borrar)
+            self.borrar = None
+        """
+        #density = 100
 
+        """
         # minimap
-
         for i in range(0, density):
             a = self.player["a"] - self.player["fov"] / 2 + self.player["fov"] * i / density
-            d, c, t = self.cast_ray(a)
+            d, c, t = self.cast_ray(a)"""
 
-
-        # separador
-
-        for i in range(0, 500): 
-            self.point(499, i)
-            self.point(500, i)
-            self.point(501, i)
 
         # draw in 3d
 
-        for i in range(0, int(self.width/2)):
-            a = self.player["a"] - self.player["fov"] / 2 + self.player["fov"] * i / (self.width / 2)
+        for i in range(0, int(self.width)):
+            a = self.player["a"] - self.player["fov"] / 2 + self.player["fov"] * i / (self.width)
             d, c, tx = self.cast_ray(a)
             
-            x = int(self.width / 2) + i
-            h = (self.height / (d * cos(a - self.player["a"]))) * self.height / 5
+            x = i
+            try:
+                h = (self.height / (d * cos(a - self.player["a"]))) * self.height / 5
+            except:
+                self.error()
+                h=0
+                
             
             if self.zbuffer[i] >= d:
                 self.zbuffer[i] = d
                 self.draw_stake(x, h, c, tx)
         
-        for enemigo in enemies:
-            self.point(enemigo["x"],enemigo["y"],(255,0,0))
+        """for enemigo in enemies:
+            self.point(enemigo["x"],enemigo["y"],(255,0,0))"""
             
         for enemigo in enemies:
             self.draw_sprite(enemigo)
+            
+        # mira
+        for i in range(240, 260): 
+            self.point(249, i)
+            self.point(250, i)
+            self.point(251, i)
+            
+            self.point(i,249)
+            self.point(i,250)
+            self.point(i,251)
 
 pygame.init()
-screen = pygame.display.set_mode((1000, 500))
+screen = pygame.display.set_mode((500, 500))
 r = Raycaster(screen)
 r.load_map('map.txt')
+inicio = True
+while inicio:
+
+    r.start()
+
+    pygame.display.flip()
+    
+    for event in pygame.event.get():
+        if (event.type == pygame.QUIT):
+            running = False
+
+        if (event.type == pygame.KEYDOWN):
+
+            if event.key == pygame.K_SPACE:
+                inicio=False
+            
+
 
 running = True
 while running:
     screen.fill(BLACK)
-    screen.fill(SKY, (r.width / 2, 0, r.width, r.height / 2))
-    screen.fill(GROUND, (r.width / 2, r.height / 2, r.width, r.height))
+    screen.fill(SKY, (0, 0, r.width, r.height / 2))
+    screen.fill(GROUND, (0, r.height / 2, r.width, r.height))
 
     r.render()
 
@@ -213,17 +412,135 @@ while running:
             running = False
 
         if (event.type == pygame.KEYDOWN):
+            if event.key == pygame.K_SPACE:
+                for enemigo in enemies:
+                    r.disparo(enemigo)
 
             if event.key == pygame.K_a:
-                r.player["a"] -= pi / 10
+                r.player["a"] = (r.player["a"] - pi / 4) % (pi * 2)
             if event.key == pygame.K_d:
-                r.player["a"] += pi / 10
+                r.player["a"] = (r.player["a"] + pi / 4) % (pi * 2)
+                
 
             if event.key == pygame.K_RIGHT:
-                r.player["x"] -= 10
+                r.last_move="r"
+                if r.player["a"] == 0:
+                    r.player["y"] += 10
+                    
+                if r.player["a"] == pi/4:
+                    r.player["x"] -= 10
+                    r.player["y"] += 10
+                    
+                if r.player["a"] == pi/2:
+                    r.player["x"] -= 10
+                    
+                if r.player["a"] == pi*3/4:
+                    r.player["x"] -= 10
+                    r.player["y"] -= 10
+                    
+                if r.player["a"] == pi:
+                    r.player["y"] -= 10
+                    
+                if r.player["a"] == pi*5/4:
+                    r.player["x"] += 10
+                    r.player["y"] -= 10
+                
+                if r.player["a"] == pi*6/4:
+                    r.player["x"] += 10
+                    
+                if r.player["a"] == pi*7/4:
+                    r.player["y"] += 10
+                    r.player["x"] += 10
+                    
             if event.key == pygame.K_LEFT:
-                r.player["x"] += 10 
+                r.last_move="l"
+                
+                if r.player["a"] == 0:
+                    r.player["y"] -= 10
+                    
+                if r.player["a"] == pi/4:
+                    r.player["x"] += 10
+                    r.player["y"] -= 10
+                    
+                if r.player["a"] == pi/2:
+                    r.player["x"] += 10
+                    
+                if r.player["a"] == pi*3/4:
+                    r.player["x"] += 10
+                    r.player["y"] += 10
+                    
+                if r.player["a"] == pi:
+                    r.player["y"] += 10
+                    
+                if r.player["a"] == pi*5/4:
+                    r.player["x"] -= 10
+                    r.player["y"] += 10
+                
+                if r.player["a"] == pi*6/4:
+                    r.player["x"] -= 10
+                    
+                if r.player["a"] == pi*7/4:
+                    r.player["y"] -= 10
+                    r.player["x"] -= 10
             if event.key == pygame.K_UP:
-                r.player["y"] += 10
+                r.last_move="u"
+                
+                if r.player["a"] == 0:
+                    r.player["x"] += 10
+                    
+                if r.player["a"] == pi/4:
+                    r.player["x"] += 10
+                    r.player["y"] += 10
+                    
+                if r.player["a"] == pi/2:
+                    r.player["y"] += 10
+                    
+                if r.player["a"] == pi*3/4:
+                    r.player["x"] -= 10
+                    r.player["y"] += 10
+                    
+                if r.player["a"] == pi:
+                    r.player["x"] -= 10
+                    
+                if r.player["a"] == pi*5/4:
+                    r.player["x"] -= 10
+                    r.player["y"] -= 10
+                
+                if r.player["a"] == pi*6/4:
+                    r.player["y"] -= 10
+                    
+                if r.player["a"] == pi*7/4:
+                    r.player["y"] -= 10
+                    r.player["x"] += 10
+                    
+                    
             if event.key == pygame.K_DOWN:
-                r.player["y"] -= 10
+                r.last_move="d"
+                
+                if r.player["a"] == 0:
+                    r.player["x"] -= 10
+                    
+                if r.player["a"] == pi/4:
+                    r.player["x"] -= 10
+                    r.player["y"] -= 10
+                    
+                if r.player["a"] == pi/2:
+                    r.player["y"] -= 10
+                    
+                if r.player["a"] == pi*3/4:
+                    r.player["x"] += 10
+                    r.player["y"] -= 10
+                    
+                if r.player["a"] == pi:
+                    r.player["x"] += 10
+                    
+                if r.player["a"] == pi*5/4:
+                    r.player["x"] += 10
+                    r.player["y"] += 10
+                
+                if r.player["a"] == pi*6/4:
+                    r.player["y"] += 10
+                    
+                if r.player["a"] == pi*7/4:
+                    r.player["y"] += 10
+                    r .player["x"] -= 10
