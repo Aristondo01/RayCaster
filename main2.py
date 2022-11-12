@@ -57,7 +57,7 @@ class Raycaster(object):
         self.block_size = 50
         self.map = []
         self.last_move=None
-        self.borrar =None
+        self.puntos=0
         self.player = {
             "x": int(self.block_size + (self.block_size / 2)),
             "y": int(self.block_size + (self.block_size / 2)),
@@ -185,8 +185,8 @@ class Raycaster(object):
         
         
         
-        for x in range(240, 260):
-            for y in range(240, 260):
+        for x in range(250, 251):
+            for y in range(250, 251):
                 tx = int((x - sprite_x)  * 580/sprite_size)
                 ty = int((y - sprite_y) * 580/sprite_size)
                 try:
@@ -195,8 +195,11 @@ class Raycaster(object):
                     c = 0
                 if c != 0 and c != TRASPARENTE:
                     print("le di al tropper #"+str(sprite["pos"]))
-                    #print(sprite["pos"])
-                    #self.borrar =sprite["pos"]
+                    c=0
+                    ubicacion = sprite["pos"]
+                    enemies.pop(ubicacion)
+                    enemies.insert(ubicacion,None)
+                    self.puntos+=1
                     break
                 
                     
@@ -363,7 +366,8 @@ class Raycaster(object):
             self.point(enemigo["x"],enemigo["y"],(255,0,0))"""
             
         for enemigo in enemies:
-            self.draw_sprite(enemigo)
+            if enemigo:
+                self.draw_sprite(enemigo)
             
         # mira
         for i in range(240, 260): 
@@ -380,6 +384,8 @@ screen = pygame.display.set_mode((500, 500))
 r = Raycaster(screen)
 r.load_map('map.txt')
 inicio = True
+running = True
+
 while inicio:
 
     r.start()
@@ -388,7 +394,9 @@ while inicio:
     
     for event in pygame.event.get():
         if (event.type == pygame.QUIT):
+            inicio = False
             running = False
+            
 
         if (event.type == pygame.KEYDOWN):
 
@@ -397,8 +405,11 @@ while inicio:
             
 
 
-running = True
 while running:
+    
+    if r.puntos ==2:
+        break
+    
     screen.fill(BLACK)
     screen.fill(SKY, (0, 0, r.width, r.height / 2))
     screen.fill(GROUND, (0, r.height / 2, r.width, r.height))
@@ -414,7 +425,8 @@ while running:
         if (event.type == pygame.KEYDOWN):
             if event.key == pygame.K_SPACE:
                 for enemigo in enemies:
-                    r.disparo(enemigo)
+                    if enemigo:
+                        r.disparo(enemigo)
 
             if event.key == pygame.K_a:
                 r.player["a"] = (r.player["a"] - pi / 4) % (pi * 2)
