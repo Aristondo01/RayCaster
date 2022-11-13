@@ -20,6 +20,10 @@ colors = [
     (21, 42, 138)
 ]
 load_screen = pygame.image.load('./inicio.png')
+next_level = pygame.image.load('./next_level.png')
+win = pygame.image.load('./WIN.png')
+
+
 
 
 wall1 = pygame.image.load('./PARED1.jpg')
@@ -46,7 +50,29 @@ enemies = [{
     "pos": 1
     }
 ]
+
+
+enemies2 = [{
+    "x": 200,
+    "y": 120,
+    "sprite": enemie1,
+    "pos": 0
+    },
+           
+    {
+    "x": 250,
+    "y": 300,
+    "sprite": enemie1,
+    "pos": 1
+    },
     
+    {
+    "x": 100,
+    "y": 100,
+    "sprite": enemie1,
+    "pos": 2
+    }
+]
 
 
 
@@ -164,10 +190,10 @@ class Raycaster(object):
     def draw_player(self):
         self.point(self.player["x"], self.player["y"])
 
-    def start(self):
+    def start(self,imagen):
         for x in range(0,500):
             for y in range(0,500):
-                c = load_screen.get_at((x,y))
+                c = imagen.get_at((x,y))
                 self.point(x,y,c)
             
     def disparo(self,sprite):
@@ -193,7 +219,7 @@ class Raycaster(object):
                     c = sprite["sprite"].get_at((tx,ty))
                 except:
                     c = 0
-                if c != 0 and c != TRASPARENTE:
+                if c != 0 and c != TRASPARENTE and self.zbuffer[250] >= d:
                     print("le di al tropper #"+str(sprite["pos"]))
                     c=0
                     ubicacion = sprite["pos"]
@@ -388,7 +414,7 @@ running = True
 
 while inicio:
 
-    r.start()
+    r.start(load_screen)
 
     pygame.display.flip()
     
@@ -556,3 +582,192 @@ while running:
                 if r.player["a"] == pi*7/4:
                     r.player["y"] += 10
                     r .player["x"] -= 10
+nivel=True
+while nivel:
+
+    r.start(next_level)
+
+    pygame.display.flip()
+    
+    for event in pygame.event.get():
+        if (event.type == pygame.QUIT):
+            inicio = False
+            running = False
+            
+
+        if (event.type == pygame.KEYDOWN):
+
+            if event.key == pygame.K_SPACE:
+                nivel=False
+
+                   
+#Nivel 2
+r.player["x"] = int(r.block_size + (r.block_size / 2))
+r.player["y"] = int(r.block_size + (r.block_size / 2))
+
+r.map=[]
+r.load_map('map2.txt')
+enemies = enemies2
+while running:
+    
+    if r.puntos ==5:
+        break
+    
+    screen.fill(BLACK)
+    screen.fill(SKY, (0, 0, r.width, r.height / 2))
+    screen.fill(GROUND, (0, r.height / 2, r.width, r.height))
+
+    r.render()
+
+    pygame.display.flip()
+    
+    for event in pygame.event.get():
+        if (event.type == pygame.QUIT):
+            running = False
+
+        if (event.type == pygame.KEYDOWN):
+            if event.key == pygame.K_SPACE:
+                for enemigo in enemies:
+                    if enemigo:
+                        r.disparo(enemigo)
+
+            if event.key == pygame.K_a:
+                r.player["a"] = (r.player["a"] - pi / 4) % (pi * 2)
+            if event.key == pygame.K_d:
+                r.player["a"] = (r.player["a"] + pi / 4) % (pi * 2)
+                
+
+            if event.key == pygame.K_RIGHT:
+                r.last_move="r"
+                if r.player["a"] == 0:
+                    r.player["y"] += 10
+                    
+                if r.player["a"] == pi/4:
+                    r.player["x"] -= 10
+                    r.player["y"] += 10
+                    
+                if r.player["a"] == pi/2:
+                    r.player["x"] -= 10
+                    
+                if r.player["a"] == pi*3/4:
+                    r.player["x"] -= 10
+                    r.player["y"] -= 10
+                    
+                if r.player["a"] == pi:
+                    r.player["y"] -= 10
+                    
+                if r.player["a"] == pi*5/4:
+                    r.player["x"] += 10
+                    r.player["y"] -= 10
+                
+                if r.player["a"] == pi*6/4:
+                    r.player["x"] += 10
+                    
+                if r.player["a"] == pi*7/4:
+                    r.player["y"] += 10
+                    r.player["x"] += 10
+                    
+            if event.key == pygame.K_LEFT:
+                r.last_move="l"
+                
+                if r.player["a"] == 0:
+                    r.player["y"] -= 10
+                    
+                if r.player["a"] == pi/4:
+                    r.player["x"] += 10
+                    r.player["y"] -= 10
+                    
+                if r.player["a"] == pi/2:
+                    r.player["x"] += 10
+                    
+                if r.player["a"] == pi*3/4:
+                    r.player["x"] += 10
+                    r.player["y"] += 10
+                    
+                if r.player["a"] == pi:
+                    r.player["y"] += 10
+                    
+                if r.player["a"] == pi*5/4:
+                    r.player["x"] -= 10
+                    r.player["y"] += 10
+                
+                if r.player["a"] == pi*6/4:
+                    r.player["x"] -= 10
+                    
+                if r.player["a"] == pi*7/4:
+                    r.player["y"] -= 10
+                    r.player["x"] -= 10
+            if event.key == pygame.K_UP:
+                r.last_move="u"
+                
+                if r.player["a"] == 0:
+                    r.player["x"] += 10
+                    
+                if r.player["a"] == pi/4:
+                    r.player["x"] += 10
+                    r.player["y"] += 10
+                    
+                if r.player["a"] == pi/2:
+                    r.player["y"] += 10
+                    
+                if r.player["a"] == pi*3/4:
+                    r.player["x"] -= 10
+                    r.player["y"] += 10
+                    
+                if r.player["a"] == pi:
+                    r.player["x"] -= 10
+                    
+                if r.player["a"] == pi*5/4:
+                    r.player["x"] -= 10
+                    r.player["y"] -= 10
+                
+                if r.player["a"] == pi*6/4:
+                    r.player["y"] -= 10
+                    
+                if r.player["a"] == pi*7/4:
+                    r.player["y"] -= 10
+                    r.player["x"] += 10
+                    
+                    
+            if event.key == pygame.K_DOWN:
+                r.last_move="d"
+                
+                if r.player["a"] == 0:
+                    r.player["x"] -= 10
+                    
+                if r.player["a"] == pi/4:
+                    r.player["x"] -= 10
+                    r.player["y"] -= 10
+                    
+                if r.player["a"] == pi/2:
+                    r.player["y"] -= 10
+                    
+                if r.player["a"] == pi*3/4:
+                    r.player["x"] += 10
+                    r.player["y"] -= 10
+                    
+                if r.player["a"] == pi:
+                    r.player["x"] += 10
+                    
+                if r.player["a"] == pi*5/4:
+                    r.player["x"] += 10
+                    r.player["y"] += 10
+                
+                if r.player["a"] == pi*6/4:
+                    r.player["y"] += 10
+                    
+                if r.player["a"] == pi*7/4:
+                    r.player["y"] += 10
+                    r .player["x"] -= 10 
+
+
+while nivel:
+
+    r.start(win)
+
+    pygame.display.flip()
+    
+    for event in pygame.event.get():
+        if (event.type == pygame.QUIT):
+            inicio = False
+            running = False
