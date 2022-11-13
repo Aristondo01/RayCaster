@@ -1,6 +1,7 @@
 import pygame
 from math import cos, sin, pi,atan2
-import random
+from OpenGL.GL import *
+
 
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
@@ -220,7 +221,7 @@ class Raycaster(object):
                 except:
                     c = 0
                 if c != 0 and c != TRASPARENTE and self.zbuffer[250] >= d:
-                    print("le di al tropper #"+str(sprite["pos"]))
+                    #print("le di al tropper #"+str(sprite["pos"]))
                     c=0
                     ubicacion = sprite["pos"]
                     enemies.pop(ubicacion)
@@ -355,21 +356,6 @@ class Raycaster(object):
         #self.draw_player()
         self.clearZ()
 
-        """
-        if self.borrar:
-            print("hola")
-            enemies.pop(self.borrar)
-            self.borrar = None
-        """
-        #density = 100
-
-        """
-        # minimap
-        for i in range(0, density):
-            a = self.player["a"] - self.player["fov"] / 2 + self.player["fov"] * i / density
-            d, c, t = self.cast_ray(a)"""
-
-
         # draw in 3d
 
         for i in range(0, int(self.width)):
@@ -411,6 +397,9 @@ r = Raycaster(screen)
 r.load_map('map.txt')
 inicio = True
 running = True
+nivel=True
+final=True
+
 
 while inicio:
 
@@ -447,6 +436,7 @@ while running:
     for event in pygame.event.get():
         if (event.type == pygame.QUIT):
             running = False
+            nivel=False
 
         if (event.type == pygame.KEYDOWN):
             if event.key == pygame.K_SPACE:
@@ -582,7 +572,6 @@ while running:
                 if r.player["a"] == pi*7/4:
                     r.player["y"] += 10
                     r .player["x"] -= 10
-nivel=True
 while nivel:
 
     r.start(next_level)
@@ -761,7 +750,7 @@ while running:
                     r .player["x"] -= 10 
 
 
-while nivel:
+while final:
 
     r.start(win)
 
@@ -769,5 +758,4 @@ while nivel:
     
     for event in pygame.event.get():
         if (event.type == pygame.QUIT):
-            inicio = False
-            running = False
+            final = False

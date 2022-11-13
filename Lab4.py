@@ -61,15 +61,59 @@ glUseProgram(shader)
 
 
 vertex_data = numpy.array([
-    -0.5, -0.5, 0.0,
-     0.5, -0.5, 0.0,
-    -0.5,  0.5, 0.0,
-     -0.5, -0.5, 0.0,
-     0.5, -0.5, 0.0,
-     0.5,  0.5, 0.0,
-     
-     
-     
+    #Caras frontales
+    1, 0, 0,
+    0, 1, 0,
+    0, 0, 0,
+    
+    1, 0, 0,
+    0, 1, 0,
+    1, 1, 0,
+    
+    1, 0, 1,
+    0, 1, 1,
+    0, 0, 1,
+    
+    1, 0, 1,
+    0, 1, 1,
+    1, 1, 1,
+#---------------------------------------    
+    
+    0, 1, 0,
+    0, 0, 1, 
+    0, 0, 0,
+    
+    0, 1, 0,
+    0, 0, 1,
+    0, 1, 1,
+    
+    1, 1, 0, 
+    1, 0, 1, 
+    1, 0, 0, 
+    
+#    1, 1, 0,
+#    1, 0, 1,
+#    1, 1, 1,
+    
+#---------------------------------------    
+    
+    0, 1, 1,  
+    1, 1, 0,  
+    0, 1, 0,  
+    
+    0, 1, 1, 
+    1, 1, 0, 
+    1, 1, 1,     
+    
+    
+    0, 0, 1,  
+    1, 0, 0,  
+    0, 0, 0,  
+    
+    0, 0, 1, 
+    1, 0, 0, 
+    1, 0, 1, 
+
 ], dtype=numpy.float32)
 
 vertex_buffer_object = glGenBuffers(1)
@@ -105,10 +149,10 @@ glVertexAttribPointer(
 glEnableVertexAttribArray(1)
 
 
-def calculateMatrix(angle):
+def calculateMatrix(angle,vector_rotatio):
     i = glm.mat4(1)
-    translate = glm.translate(i, glm.vec3(0, 0, 0))
-    rotate = glm.rotate(i, glm.radians(angle), glm.vec3(0, 1, 0))
+    translate = glm.translate(i, glm.vec3(0, -0.5, 0))
+    rotate = glm.rotate(i, glm.radians(angle), glm.vec3(vector_rotatio))
     scale = glm.scale(i, glm.vec3(1, 1, 1))
 
     model = translate * rotate * scale
@@ -144,32 +188,47 @@ running = True
 glClearColor(0.5, 1.0, 0.5, 1.0)
 
 r = 0
-
+inicio = True
 while running:
+    
     r += 1
-    glClear(GL_COLOR_BUFFER_BIT)
+    
+    if inicio:
+        glClear(GL_COLOR_BUFFER_BIT)
 
-    color1 = random.random()
-    color2 = random.random()
-    color3 = random.random()
-
-    color = glm.vec3(color1, color2, color3)
-
-    glUniform3fv(
-        glGetUniformLocation(shader,'color'),
-        1,
-        glm.value_ptr(color)
-    )
-
-    calculateMatrix(r)
+        color = glm.vec3(255, 0, 0)
+        glUniform3fv(
+                glGetUniformLocation(shader,'color'),
+                1,
+                glm.value_ptr(color)
+            )
+        calculateMatrix(2*r,(0, 1, 0))
+    
+    
+    
 
     pygame.time.wait(50)
 
 
-    glDrawArrays(GL_TRIANGLES, 0, 3)
+    glDrawArrays(GL_TRIANGLES, 0, len(vertex_data))
 
     pygame.display.flip()
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+        """ 
+        if (event.key == pygame.K_1):
+            color1 = random.random()
+            color2 = random.random()
+            color3 = random.random()
+
+            color = glm.vec3(color1, color2, color3)
+
+            glUniform3fv(
+                glGetUniformLocation(shader,'color'),
+                1,
+                glm.value_ptr(color)
+            )
+
+            calculateMatrix(r,(0.5, 1, 0.1))"""
