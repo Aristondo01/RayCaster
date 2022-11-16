@@ -411,6 +411,8 @@ while inicio:
         if (event.type == pygame.QUIT):
             inicio = False
             running = False
+            final =False
+            nivel = False
             
 
         if (event.type == pygame.KEYDOWN):
@@ -435,8 +437,10 @@ while running:
     
     for event in pygame.event.get():
         if (event.type == pygame.QUIT):
+            inicio = False
             running = False
             nivel=False
+            final =False
 
         if (event.type == pygame.KEYDOWN):
             if event.key == pygame.K_SPACE:
@@ -582,6 +586,9 @@ while nivel:
         if (event.type == pygame.QUIT):
             inicio = False
             running = False
+            nivel=False
+            final =False
+            
             
 
         if (event.type == pygame.KEYDOWN):
@@ -612,7 +619,10 @@ while running:
     
     for event in pygame.event.get():
         if (event.type == pygame.QUIT):
+            inicio = False
             running = False
+            nivel=False
+            final =False
 
         if (event.type == pygame.KEYDOWN):
             if event.key == pygame.K_SPACE:
