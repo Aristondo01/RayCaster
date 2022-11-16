@@ -389,7 +389,7 @@ while running:
         shader = shader2
         glUseProgram(shader)              
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-        mov = (0,sin(r/10),cos(-r/10))
+        mov = (-sin(r/10),sin(r/10),cos(-r/10))
 
         if r % 15 ==0:
             color1 = random.random()
