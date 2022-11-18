@@ -38,18 +38,20 @@ walls = {
 }
 
 enemie1 = pygame.image.load('./sprite1.png')
+enemie2 = pygame.image.load('./sprite2.png')
+
 
 enemies = [{
-    "x": 120,
+    "x": 100,
     "y": 120,
-    "sprite": enemie1,
+    "sprite": [enemie1,enemie2],
     "pos": 0
     },
            
     {
     "x": 100,
     "y": 300,
-    "sprite": enemie1,
+    "sprite": [enemie1,enemie2],
     "pos": 1
     }
 ]
@@ -58,25 +60,24 @@ enemies = [{
 enemies2 = [{
     "x": 200,
     "y": 120,
-    "sprite": enemie1,
+    "sprite": [enemie1,enemie2],
     "pos": 0
     },
            
     {
     "x": 250,
     "y": 300,
-    "sprite": enemie1,
+    "sprite": [enemie1,enemie2],
     "pos": 1
     },
     
     {
     "x": 100,
     "y": 100,
-    "sprite": enemie1,
+    "sprite": [enemie1,enemie2],
     "pos": 2
     }
 ]
-
 
 
 class Raycaster(object):
@@ -87,6 +88,7 @@ class Raycaster(object):
         self.map = []
         self.last_move=None
         self.puntos=0
+        self.enemie_sprite = 0 
         self.player = {
             "x": int(self.block_size + (self.block_size / 2)),
             "y": int(self.block_size + (self.block_size / 2)),
@@ -153,7 +155,6 @@ class Raycaster(object):
             d += 1
     def draw_sprite(self,sprite):
         
-        
         px,py = self.player["x"],self.player["y"]
         sx,sy = sprite["x"],sprite["y"]
         
@@ -168,12 +169,12 @@ class Raycaster(object):
         
         
         
-        
+        self.enemie_sprite = (self.enemie_sprite+1)%2
         for x in range(sprite_x,sprite_x+sprite_size):
             for y in range(sprite_y,sprite_y+sprite_size):
                 tx = int((x - sprite_x)  * 580/sprite_size)
                 ty = int((y - sprite_y) * 580/sprite_size)
-                c = sprite["sprite"].get_at((tx,ty))
+                c = sprite["sprite"][self.enemie_sprite].get_at((tx,ty))
                 if c != TRASPARENTE:
                     if x>0 and x<500:
                         if self.zbuffer[x] >= d:
@@ -220,7 +221,7 @@ class Raycaster(object):
                 tx = int((x - sprite_x)  * 580/sprite_size)
                 ty = int((y - sprite_y) * 580/sprite_size)
                 try:
-                    c = sprite["sprite"].get_at((tx,ty))
+                    c = sprite["sprite"][0].get_at((tx,ty))
                 except:
                     c = 0
                 if c != 0 and c != TRASPARENTE and self.zbuffer[250] >= d:
@@ -475,6 +476,7 @@ while running1:
                 for enemigo in enemies:
                     if enemigo:
                         r.disparo(enemigo)
+                        r.draw_sprite(enemigo)
 
             if event.key == pygame.K_a:
                 r.player["a"] = (r.player["a"] - pi / 4) % (pi * 2)
@@ -659,6 +661,7 @@ while running2:
                 for enemigo in enemies:
                     if enemigo:
                         r.disparo(enemigo)
+                        
 
             if event.key == pygame.K_a:
                 r.player["a"] = (r.player["a"] - pi / 4) % (pi * 2)
