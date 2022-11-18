@@ -20,9 +20,11 @@ colors = [
     (219, 242, 38),
     (21, 42, 138)
 ]
-load_screen = pygame.image.load('./inicio.png')
+load_screen = pygame.image.load('./inicio2.png')
 next_level = pygame.image.load('./next_level.png')
 win = pygame.image.load('./WIN.png')
+
+
 
 
 
@@ -180,8 +182,8 @@ class Raycaster(object):
             
         
     def draw_map(self):
-        for x in range(0, 500, self.block_size):
-            for y in range(0, 500, self.block_size):
+        for x in range(0, 500, int(self.block_size)):
+            for y in range(0, 500, int(self.block_size)):
                 i = int(x / self.block_size)
                 j = int(y / self.block_size)
 
@@ -198,6 +200,7 @@ class Raycaster(object):
                 self.point(x,y,c)
             
     def disparo(self,sprite):
+        pygame.mixer.Sound.play(laser_sound)
         px,py = self.player["x"],self.player["y"]
         sx,sy = sprite["x"],sprite["y"]
         
@@ -391,16 +394,35 @@ class Raycaster(object):
             self.point(i,250)
             self.point(i,251)
 
+def fps():
+    text = font.render("fps = "+str(round(clock.get_fps(),2)), True, (255,255,255), (0,0,0))
+    textRect = text.get_rect()
+    textRect.center = (35, 10)
+    display_surface.blit(text, textRect)
+    pygame.display.update() 
+    clock.tick(60)
+    
+
 pygame.init()
+import os
+os.getcwd() 
+pygame.mixer.music.load("SW.mp3")
+laser_sound = pygame.mixer.Sound('disparo_1.mp3')
 screen = pygame.display.set_mode((500, 500))
+clock = pygame.time.Clock()
+display_surface = pygame.display.set_mode((500, 500))
+font = pygame.font.Font('freesansbold.ttf', 14)
+
 r = Raycaster(screen)
 r.load_map('map.txt')
 inicio = True
-running = True
+running1 = True
+running2 = True
+
 nivel=True
 final=True
 
-
+pygame.mixer.music.play(-1)
 while inicio:
 
     r.start(load_screen)
@@ -410,20 +432,25 @@ while inicio:
     for event in pygame.event.get():
         if (event.type == pygame.QUIT):
             inicio = False
-            running = False
+            running1 = False
+            running2 = False
             final =False
             nivel = False
             
 
         if (event.type == pygame.KEYDOWN):
 
-            if event.key == pygame.K_SPACE:
+            if event.key == pygame.K_1:
                 inicio=False
+            if event.key == pygame.K_2:
+                inicio=False
+                running1 = False
+                r.puntos=2
             
 
 
-while running:
-    
+while running1:
+    fps()
     if r.puntos ==2:
         break
     
@@ -438,7 +465,8 @@ while running:
     for event in pygame.event.get():
         if (event.type == pygame.QUIT):
             inicio = False
-            running = False
+            running1 = False
+            running2 = False
             nivel=False
             final =False
 
@@ -585,7 +613,8 @@ while nivel:
     for event in pygame.event.get():
         if (event.type == pygame.QUIT):
             inicio = False
-            running = False
+            running1 = False
+            running2 = False
             nivel=False
             final =False
             
@@ -604,8 +633,8 @@ r.player["y"] = int(r.block_size + (r.block_size / 2))
 r.map=[]
 r.load_map('map2.txt')
 enemies = enemies2
-while running:
-    
+while running2:
+    fps()
     if r.puntos ==5:
         break
     
@@ -620,7 +649,8 @@ while running:
     for event in pygame.event.get():
         if (event.type == pygame.QUIT):
             inicio = False
-            running = False
+            running1 = False
+            running2 = False
             nivel=False
             final =False
 

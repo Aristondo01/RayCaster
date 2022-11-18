@@ -15,7 +15,6 @@ screen = pygame.display.set_mode(
 # dT = pygame.time.Clock()
 
 
-
 vertex_shader = """
 #version 460
 layout (location = 0) in vec3 position;
